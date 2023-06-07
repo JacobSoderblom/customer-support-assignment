@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+    provider = "sqlite"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id       String   @id @default(cuid())
+    name     String
+    email    String   @unique
+    image    String
+    password String
+    role     String
+    tickets  Ticket[] // One-to-many relationship with Case
+}
+
+model Ticket {
+    id            String   @id @default(cuid())
+    customerName  String
+    customerEmail String
+    description   String
+    productNo     String
+    agentId       String? // Nullable agent ID
+    agent         User?    @relation(fields: [agentId], references: [id])
+    resolved      Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
